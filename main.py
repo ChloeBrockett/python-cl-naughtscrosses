@@ -30,20 +30,31 @@ while (running):
 
     while (activeGame):
         #Pre turn housekeeping
-        if (counter>=(width*height)):
-            print ("Game ends in a draw")
-            activeGame=False
-            break
+        #Check if the current board state has a winner
         winner = game.checkWin(board)
         if (winner):
             print ("Congratulations to player "+winner+"! You have won!")
+            activeGame=False
+            break
+        #Check if the maximum number of moves have taken place and end the game in a draw if so 
+        if (counter>=(width*height)):
+            print ("Game ends in a draw")
             activeGame=False
             break
 
         #Call code to handle turns 
         if (playerTurn):
             board = game.playerTurn(board)
-            counter+=1
-            game.printBoard(board)
+            
+            
+            
+        else:
+            print ("Computer turn") 
+            board=game.computerTurn(board)
+        #Finally, render the updated board, increment the turn counter, and flip the turn controlling boolean
+        game.printBoard(board)
+        counter +=1
+        playerTurn = not playerTurn
+
 
                 

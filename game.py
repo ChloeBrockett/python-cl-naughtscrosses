@@ -1,5 +1,7 @@
 #This is the file containing the methods associated with playing the game
 
+import copy
+
 import constant
 whitespace = constant.EMPTY_SQUARE
 height = constant.BOARD_HEIGHT
@@ -82,6 +84,16 @@ def setBoardSquare(board,row,col,piece):
     board[row][col]=piece
     return board
 
+#Given a board state, return a list of all empty (row, col) coordinate tuples
+def findEmptySquares(board):
+    empties = []
+    for row in range(0,len(board)):
+        for col in range (0,len(board[row])):
+            if (board[row][col] == whitespace):
+                empties.append((row,col))
+    return empties
+
+
 #Function to ask the player to input a move. Returns a validated move as an row col tuple
 def playerGetMoveInput(board):
     inputtingMove = True
@@ -99,6 +111,59 @@ def playerGetMoveInput(board):
           
     return (row,col)
 
+def minimax(board,maximisingPlayer,maximisingPlayersPiece,minimisingPlayersPiece):
+    #We need to check if the node is a terminal node. 
+    #The game ends when the board is full, or if a player has won
+    winner = checkWin(board)
+    empties = findEmptySquares(board)
+    #If there are no empty squares, then the game has ended in a draw and we should give the node a net score of 0
+    if (len(empties)==0):
+        return (0,None)
+    
+    #If the winner is the player we care about maximising for, then return a positive score
+    #If the winner is not the player we care about, then return a negative score
+    if (winner==maximisingPlayersPiece):
+        return (1,None)
+    elif (winner):
+        return (-1,None)
+
+    #If we have not reached a terminal node, we should continue to traverse our tree. 
+    if (maximisingPlayer):
+        #Here we are the player picking the move that maximises their shot at winning, so we initialise our score
+        #to an arbitrarily huge negative number
+        bestScore = -1000
+        bestMove = None
+        #We should then generate children nodes using the list of empties we have
+        #It is the maximising players turn so we use their piece
+        #First we need to copy the existing board without a reference so we can modify it, then we can create a child 
+        #where the computer plays each empty square
+        children = []
+        for i in range(0,len(empties)):
+            children.append(copy.deepcopy(board))
+            setBoardSquare(children[i],empties[i][0],empties[i][1],maximisingPlayersPiece)
+        for i in range(0,len(children)):
+            score = max(bestScore,  minimax(children[i],False,maximisingPlayersPiece,minimisingPlayersPiece)[0])
+            if score>bestScore:
+                bestScore=score
+                bestMove=empties[i]
+
+        return (score,bestMove)
+    else:
+        #we want to do the opposite of the above
+        bestScore = 1000
+        bestMove=None
+        children = []
+        for i in range(0,len(empties)):
+            children.append(copy.deepcopy(board))
+            setBoardSquare(children[i],empties[i][0],empties[i][1],minimisingPlayersPiece)
+        for i in range(0,len(children)):
+            score = min(bestScore,minimax(children[i],True,maximisingPlayersPiece,minimisingPlayersPiece)[0])
+            if score<bestScore:
+                bestScore=score
+                bestMove=empties[i]
+
+        return (score,bestMove)
+        
 
 #Function that handles the logic for the players turn. 
 def playerTurn(board):
@@ -124,7 +189,13 @@ def playerTurn(board):
     #Once we have the input we can put it on the board
     board = setBoardSquare(board,row,col,playerPiece)
     return (board)
-        
+
+#Function that handles the logic for the computers turn
+def computerTurn(board):
+    currentBoard = board
+    bestMove = minimax(currentBoard,True,computerPiece,playerPiece)[1]
+    setBoardSquare(board,bestMove[0],bestMove[1],computerPiece)
+    return board
 
 #Initialise a game board and return it. 
 def boardInit():
