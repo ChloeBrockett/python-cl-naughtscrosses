@@ -9,6 +9,8 @@ import game, constant
 
 playerPiece = constant.PLAYER1_SYMBOL
 computerPiece = constant.PLAYER2_SYMBOL
+width = constant.BOARD_WIDTH
+height = constant.BOARD_HEIGHT
 
 running =True
 activeGame = False
@@ -16,6 +18,7 @@ playerTurn = True
 
 
 while (running):
+    counter = 0
     choice=input("Do you want to play a round? y/n\n")
     if ((choice !="y") & (choice!= "n")):
         print("y or n")
@@ -26,8 +29,21 @@ while (running):
         board = game.boardInit()
 
     while (activeGame):
+        #Pre turn housekeeping
+        if (counter>=(width*height)):
+            print ("Game ends in a draw")
+            activeGame=False
+            break
+        winner = game.checkWin(board)
+        if (winner):
+            print ("Congratulations to player "+winner+"! You have won!")
+            activeGame=False
+            break
+
+        #Call code to handle turns 
         if (playerTurn):
             board = game.playerTurn(board)
-            board = [["a","b","c"],["d","e","f"],["g","h","i"]]
+            counter+=1
             game.printBoard(board)
-            game.checkWin(board,playerPiece)
+
+                

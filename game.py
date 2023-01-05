@@ -40,8 +40,9 @@ def checkSquareEmpty(board,row,col):
     else:
         return False
 
-#function to check if a specified player has won. For now this will be hard coded to the 3x3 default board. In future this could be expanded on for larger boards Returns a bool
-def checkWin (board,piece):
+#function to check if a specified player has won. This could be expanded for checking different combinations on nonsquare boards.
+#Should currently be expandable to all square sized boards where the win condition is a full line.
+def checkWin (board):
     #A player wins if they get a complete line. This means checking each column, each row, and both diagonals
     lines = []
     #Get Rows
@@ -57,7 +58,7 @@ def checkWin (board,piece):
         lines.append(newLine)
 
     #Get Diagonals
-    #Harder to do programatically - will only work for square boards really too
+    #Harder to do programatically - will only work for square boards too
     #Downward Diagona has the same row and col index
     #Upward Diagonal has the row index backwards relative to the column 
     downwardDiag = []
@@ -67,8 +68,13 @@ def checkWin (board,piece):
         upwardDiag.append(board[height-1-row][row])
     lines.append(downwardDiag)
     lines.append(upwardDiag)
-    print (lines)
-    return False
+
+    #Now that we have all the lines. 
+    for line in lines:
+        if ( (len(set(line)) == 1) & (line [0] != whitespace) ):
+            return line[0]
+        
+    return None
 
 
 #helper function that sets a square to the specified piece. Returns the new board 
