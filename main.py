@@ -5,10 +5,8 @@ In future, I would like to include optimisations like alpha/beta pruning, as wel
 Ideally tests would be done first, but this is to demonstrate that I can implement algorithms.  
 """
 
-import game, constant
+import game, constant, board as gameBoard
 
-playerPiece = constant.PLAYER1_SYMBOL
-computerPiece = constant.PLAYER2_SYMBOL
 width = constant.BOARD_WIDTH
 height = constant.BOARD_HEIGHT
 
@@ -18,7 +16,7 @@ playerTurn = True
 
 
 while (running):
-    counter = 0
+    turnCounter = 0
     choice=input("Do you want to play a round? y/n\n")
     if ((choice !="y") & (choice!= "n")):
         print("y or n")
@@ -26,7 +24,8 @@ while (running):
         running=False
     elif (choice=="y"):
         activeGame=True
-        board = game.boardInit()
+        board = gameBoard.boardInit()
+        gameBoard.printBoard(board)
 
     while (activeGame):
         #Pre turn housekeeping
@@ -37,24 +36,19 @@ while (running):
             activeGame=False
             break
         #Check if the maximum number of moves have taken place and end the game in a draw if so 
-        if (counter>=(width*height)):
+        if (turnCounter>=(width*height)):
             print ("Game ends in a draw")
             activeGame=False
             break
 
         #Call code to handle turns 
         if (playerTurn):
-            board = game.playerTurn(board)
-            
-            
-            
+            game.playerTurn(board)
+              
         else:
             print ("Computer turn") 
-            board=game.computerTurn(board)
+            game.computerTurn(board)
         #Finally, render the updated board, increment the turn counter, and flip the turn controlling boolean
-        game.printBoard(board)
-        counter +=1
+        gameBoard.printBoard(board)
+        turnCounter +=1
         playerTurn = not playerTurn
-
-
-                
